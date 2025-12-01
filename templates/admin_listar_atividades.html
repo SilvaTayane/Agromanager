@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="h3 text-gray-900">Gerenciamento de Tarefas</h1>
+            <p class="text-gray-600 mb-0">Organize e acompanhe as atividades da fazenda</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'listar_atividades_admin' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+
+            <a href="{% url 'criar_atividade' %}" class="btn btn-primary-custom">
+                <i class="bi bi-plus-circle me-2"></i> Criar Atividade
+            </a>
+
+            <a href="{% url 'area_trabalhador' %}" class="btn btn-primary-custom">
+                visão trabalhador
+            </a>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-funnel me-2"></i>Filtrar Atividades
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select name="tipo" class="form-select">
+                        <option value="">Todos</option>
+                        {% for tipo in tipos %}
+                        <option value="{{ tipo }}" {% if filtros_ativos.tipo == tipo %}selected{% endif %}>{{ tipo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Prioridade</label>
+                    <select name="prioridade" class="form-select">
+                        <option value="">Todas</option>
+                        {% for p in prioridades %}
+                        <option value="{{ p }}" {% if filtros_ativos.prioridade == p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Data</label>
+                    <input type="date" name="data" class="form-control" value="{{ filtros_ativos.data }}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Responsável</label>
+                    <select name="responsavel" class="form-select">
+                        <option value="">Todos</option>
+                        {% for resp in responsaveis %}
+                        <option value="{{ resp }}" {% if filtros_ativos.responsavel == resp %}selected{% endif %}>{{ resp }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12 d-flex gap-2">
+                    <button class="btn btn-primary-custom">
+                        <i class="bi bi-funnel"></i> Aplicar
+                    </button>
+
+                    <a href="{% url 'listar_atividades_admin' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Limpar
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- KANBAN -->
+    <div class="row g-4">
+
+        <!-- PENDENTE -->
+        <div class="col-md-4">
+            <div class="column-header pending-column mb-3">
+                <h5 class="mb-1">Pendente</h5>
+            </div>
+
+            <div class="d-flex flex-column gap-3">
+
+                {% for atividade in atividades %}
+                    {% if atividade.status in "registrada atribuida pendente atrasada" %}
+                        <div class="task-card p-3">
+
+                            <h5 class="mb-1">{{ atividade.titulo }}</h5>
+
+                            {% if atividade.status == "atrasada" %}
+                                <span class="badge bg-danger mb-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i> Atrasada
+                                </span>
+                            {% endif %}
+
+                            <p class="mb-1 text-muted">{{ atividade.descricao }}</p>
+
+                            <span class="badge bg-info">{{ atividade.tipo_atividade }}</span>
+                            <span class="badge bg-secondary">{{ atividade.prioridade }}</span>
+
+                            <p class="mb-0 mt-2">
+                                <strong>Responsável:</strong>
+                                {{ atividade.nome_trabalhador|default:"—" }}
+                            </p>
+
+                            <!-- BOTÕES -->
+                            <div class="d-flex gap-2 mt-3">
+                                <a href="{% url 'editar_atividade' atividade.id_atividade %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+
+                                <form method="POST" action="{% url 'excluir_atividade' atividade.id_atividade %}"
+                                      onsubmit="return confirm('Tem certeza que deseja excluir esta atividade?');">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <p class="text-muted">Nenhuma tarefa pendente.</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- EM ANDAMENTO -->
+        <div class="col-md-4">
+            <div class="column-header in-progress-column mb-3">
+                <h5 class="mb-1">Em Andamento</h5>
+            </div>
+
+            <div class="d-flex flex-column gap-3">
+
+                {% for atividade in atividades %}
+                    {% if atividade.status == "em_andamento" %}
+                        <div class="task-card p-3">
+
+                            <h5 class="mb-1">{{ atividade.titulo }}</h5>
+                            <p class="mb-1 text-muted">{{ atividade.descricao }}</p>
+
+                            <span class="badge bg-info">{{ atividade.tipo_atividade }}</span>
+                            <span class="badge bg-secondary">{{ atividade.prioridade }}</span>
+
+                            <p class="mb-0 mt-2">
+                                <strong>Responsável:</strong>
+                                {{ atividade.nome_trabalhador|default:"—" }}
+                            </p>
+
+                            <!-- BOTÕES -->
+                            <div class="d-flex gap-2 mt-3">
+                                <a href="{% url 'editar_atividade' atividade.id_atividade %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+
+                                <form method="POST" action="{% url 'excluir_atividade' atividade.id_atividade %}"
+                                      onsubmit="return confirm('Tem certeza que deseja excluir esta atividade?');">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <p class="text-muted">Nenhuma tarefa em andamento.</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- CONCLUÍDO -->
+        <div class="col-md-4">
+            <div class="column-header completed-column mb-3">
+                <h5 class="mb-1">Concluído</h5>
+            </div>
+
+            <div class="d-flex flex-column gap-3">
+
+                {% for atividade in atividades %}
+                    {% if atividade.status == "concluida" %}
+                        <div class="task-card p-3">
+
+                            <h5 class="mb-1">{{ atividade.titulo }}</h5>
+                            <p class="mb-1 text-muted">{{ atividade.descricao }}</p>
+
+                            <span class="badge bg-info">{{ atividade.tipo_atividade }}</span>
+                            <span class="badge bg-secondary">{{ atividade.prioridade }}</span>
+
+                            <p class="mb-0 mt-2">
+                                <strong>Responsável:</strong>
+                                {{ atividade.nome_trabalhador|default:"—" }}
+                            </p>
+                            </div>
+
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <p class="text-muted">Nenhuma tarefa concluída.</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .task-card {
+        transition: box-shadow 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        border-radius: 0.5rem;
+        position: relative;
+    }
+    .task-card:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    }
+    .column-header { border-radius: .5rem; padding: .75rem; }
+    .pending-column { background:#fff3cd; }
+    .in-progress-column { background:#cfe2ff; }
+    .completed-column { background:#d1e7dd; }
+    .btn-primary-custom {
+        background:#2E5D3A; border-color:#2E5D3A; color:white;
+    }
+    .btn-primary-custom:hover {
+        background:#1a3621; border-color:#1a3621; color:white;
+    }
+</style>
+
+{% endblock %}

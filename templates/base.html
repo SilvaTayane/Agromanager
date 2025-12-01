@@ -1,0 +1,540 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="{% static 'logo.png' %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agromanager</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <style>
+        /* Seus estilos CSS permanecem os mesmos */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa;
+        }
+      
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            background-color: #2E5D3A;
+            color: white;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed { width: 64px; }
+        .sidebar.expanded { width: 256px; }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #1a3621;
+            display: flex;
+            align-items: center;
+            /* adicionado */
+            justify-content: space-between; 
+        }
+
+        .logo { 
+            height: 40px; width: 40px;
+            /* adicionado */
+            width: 40px; 
+            transition: opacity 0.3s;
+        }
+
+        /* adicionado */
+        .logo.hidden {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: none;
+            padding: 0.5rem;
+        }
+
+        .expand-btn.visible {
+        display: block;
+        }
+
+        .nav-btn.collapsed {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .nav-btn.collapsed .nav-icon {
+            margin: 0;
+        }
+
+        /* ----- */
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            /* Transição suave */
+            transition: opacity 0.3s;
+            /* Garantir que esteja visível inicialmente */
+            display: block;
+        }
+
+        .sidebar.collapsed .toggle-btn {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 0.5rem;
+        }
+
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+
+        .nav-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .nav-btn.active {
+            background-color: white;
+            color: #2E5D3A;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid #1a3621;
+            font-size: 0.75rem;
+            color: #d1d5db;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 0;
+        }
+
+        .page-title { font-size: 24px; color: #2E5D3A; }
+
+
+        /* ------ TOPBAR Style ------ */
+        .topbar {
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 1.5rem;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            background-color: #2E5D3A;
+        }
+        
+        .dropdown-toggle::after {
+            display: none;
+        }
+        
+        .custom-dropdown {
+            min-width: 14rem;
+        }
+        
+        .logout-btn {
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+        
+        .logout-btn:hover {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        /* ESTILOS ESPECÍFICOS PARA CORRESPONDER AO LAYOUT ORIGINAL */
+        .topbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .topbar-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a3621;
+            margin: 0;
+        }
+
+        .topbar-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            background-color: white;
+        }
+        .btn-light {
+            background-color: white;
+            border: none;
+        }
+
+        .user-info:hover {
+            background-color: #f3f4f6;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="app-container">
+      
+      <!-- SIDEBAR -->
+      <aside class="sidebar expanded" id="sidebar">
+
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center">
+                <img src="{% static 'logo.png' %}" alt="logo" class="logo" id="sidebar-logo">
+                <button class="expand-btn" id="expand-sidebar">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <span id="app-name" class="ms-2">AgroManager</span>
+            </div>
+
+            <button class="toggle-btn" id="toggle-sidebar">
+                <i class="bi bi-chevron-left" id="toggle-icon"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-list" id="nav-list"></ul>
+        </nav>
+
+          
+
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-content mx-2 my-3">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+              <div class="topbar-content">
+                  <!-- Lado esquerdo: Título e subtítulo -->
+                  <div class="topbar-left">
+                      <h1 class="topbar-title">AgroManager</h1>
+                      <p class="topbar-subtitle" id="userRoleText">
+                          <!-- O texto será preenchido dinamicamente -->
+                      </p>
+                  </div>
+
+                  <!-- Lado direito: Informações do usuário -->
+                  <div class="topbar-right">
+                      <!-- Dropdown Menu -->
+                      <div class="dropdown">
+                          <button class="btn btn-light d-flex align-items-center gap-2 dropdown-toggle p-2" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                              <div class="user-details">
+                                  <p class="user-name" id="userName">Nome do Usuário</p>
+                                  <p class="user-role" id="userRole">
+                                      <!-- Cargo será preenchido dinamicamente -->
+                                  </p>
+                              </div>
+                              <div class="avatar ms-2" id="userAvatar">
+                                  <!-- Iniciais serão preenchidas dinamicamente -->
+                              </div>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="userDropdown">
+                              <li><h6 class="dropdown-header">Minha Conta</h6></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li>
+                                  <a class="dropdown-item" href="#">
+                                      <i class="bi bi-person me-2"></i>
+                                      <span>Perfil</span>
+                                  </a>
+                              </li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li>
+                                  <a class="dropdown-item" href="#" id="logoutDropdown">
+                                      <i class="bi bi-box-arrow-right me-2"></i>
+                                      <span>Sair</span>
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
+
+                      <!-- Botão Sair -->
+                      <button type="button" class="btn btn-outline-secondary logout-btn d-flex align-items-center gap-2" id="logoutButton">
+                          <i class="bi bi-box-arrow-right"></i>
+                          <span class="d-none d-sm-inline">Sair</span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+
+        <!-- CONTENT -->
+          <div id="dynamic-content">
+              {% block content %}
+              {% endblock %}
+          </div>
+      </div>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        let currentPage = "{{ request.resolver_match.url_name|default:'dashboard' }}";
+        let userRole = 'admin';
+
+        // Dados do usuário (exemplo) ATUALIZAR ISSO
+        const user = {
+            name: "João Silva",
+            role: userRole
+        };
+
+        // URLs do Django - você pode passar essas variáveis do contexto ou definir aqui
+        const menuItems = [
+            { 
+                id: 'dashboard', 
+                label: 'Dashboard', 
+                icon: 'bi-speedometer2', 
+                roles: ['admin','employee'],
+                url: "{% url 'dashboard' %}"
+            },
+            { 
+                id: 'listar_animais', 
+                label: 'Animais', 
+                icon: 'bi bi-piggy-bank', 
+                roles: ['admin','employee'],
+                url: "{% url 'listar_animais' %}"
+            },
+            { 
+                id: 'tasks', 
+                label: 'Tarefas', 
+                icon: 'bi-list-check', 
+                roles: ['admin','employee'],
+                url: "{% url 'listar_atividades_admin' %}"
+            },
+            { 
+                id: 'estoque', 
+                label: 'Estoque', 
+                icon: 'bi-box-seam', 
+                roles: ['admin','employee'],
+                url: "{% url 'listar_estoque' %}"
+            },
+            { 
+                id: 'localizacao', 
+                label: 'Localização', 
+                icon: 'bi bi-geo-alt fs-5 flex-shrink-0', 
+                roles: ['admin','employee'],
+                url: "{% url 'localizacao' %}"
+            },
+            { 
+                id: 'clima', 
+                label: 'Clima', 
+                icon: 'bi bi-cloud-sun fs-5 flex-shrink-0', 
+                roles: ['admin','employee'],
+                url: "{% url 'monitoramento' %}"
+            },
+            { 
+                id: 'relatorio', 
+                label: 'Relatórios', 
+                icon: 'bi bi-bar-chart fs-5 flex-shrink-0', 
+                roles: ['admin','employee'],
+                url: "{% url 'relatorio' %}"
+            },
+        ];
+
+        // Função para obter iniciais do nome
+        function getInitials(name) {
+            return name
+                .split(' ')
+                .map(part => part.charAt(0))
+                .join('')
+                .toUpperCase();
+        }
+
+        // Função para logout
+        function onLogout() {
+            alert('Função de logout acionada!');
+        }
+
+        // Função para verificar se sidebar está colapsada
+        function isSidebarCollapsed() {
+            const sidebar = document.getElementById('sidebar');
+            return sidebar.classList.contains('collapsed');
+        }
+
+        // Função para atualizar visibilidade dos elementos da sidebar
+        function updateSidebarVisibility() {
+            const logo = document.getElementById('sidebar-logo');
+            const expandBtn = document.getElementById('expand-sidebar');
+            const appName = document.getElementById('app-name');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const isCollapsed = isSidebarCollapsed();
+
+            if (isCollapsed) {
+                logo.classList.add('hidden');
+                expandBtn.classList.add('visible');
+                appName.style.display = 'none';
+                toggleIcon.className = 'bi bi-chevron-right';
+            } else {
+                logo.classList.remove('hidden');
+                expandBtn.classList.remove('visible');
+                appName.style.display = 'inline';
+                toggleIcon.className = 'bi bi-chevron-left';
+            }
+        }
+
+        // Função para renderizar a sidebar
+        function renderSidebar() {
+            const navList = document.getElementById('nav-list');
+            navList.innerHTML = '';
+
+            const isCollapsed = isSidebarCollapsed();
+
+            menuItems
+                .filter(item => item.roles.includes(userRole))
+                .forEach(item => {
+                    const li = document.createElement('li');
+
+                    if (isCollapsed) {
+                        // Sidebar colapsada - apenas ícone
+                        li.innerHTML = `
+                            <a href="${item.url}" class="nav-btn ${currentPage === item.id ? 'active' : ''}">
+                                <i class="${item.icon}"></i>
+                            </a>
+                        `;
+                    } else {
+                        // Sidebar expandida - ícone + texto
+                        li.innerHTML = `
+                            <a href="${item.url}" class="nav-btn ${currentPage === item.id ? 'active' : ''}">
+                                <i class="${item.icon}"></i>
+                                <span>${item.label}</span>
+                            </a>
+                        `;
+                    }
+
+                    navList.appendChild(li);
+                });
+        }
+
+        // Função para alternar a sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.replace('collapsed', 'expanded');
+            } else {
+                sidebar.classList.replace('expanded', 'collapsed');
+            }
+
+            updateSidebarVisibility();
+            renderSidebar();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            document.getElementById('toggle-sidebar').addEventListener('click', toggleSidebar);
+            document.getElementById('expand-sidebar').addEventListener('click', toggleSidebar);
+            
+            // Atualizar informações do usuário
+            const userRoleText = document.getElementById('userRoleText');
+            userRoleText.textContent = user.role === 'admin' ? 'Painel do Administrador' : 'Painel do Funcionário';
+            
+            const userAvatar = document.getElementById('userAvatar');
+            userAvatar.textContent = getInitials(user.name);
+            
+            const userName = document.getElementById('userName');
+            userName.textContent = user.name;
+            
+            const userRoleElement = document.getElementById('userRole');
+            userRoleElement.textContent = user.role === 'admin' ? 'Administrador' : 'Funcionário';
+            
+            // Adicionar eventos de clique para logout
+            document.getElementById('logoutButton').addEventListener('click', onLogout);
+            document.getElementById('logoutDropdown').addEventListener('click', onLogout);
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/heroicons@2.0.18/dist/heroicons.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </body>
+</html>

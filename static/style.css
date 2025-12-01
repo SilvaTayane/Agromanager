@@ -1,0 +1,50 @@
+ body {
+            background: linear-gradient(135deg, #2E5D3A 0%, #1a3621 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+         }
+        
+        .login-card {
+            background-color: rgba(242, 232, 210, 1);
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo {
+            height: 96px;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+        
+        .btn-primary {
+            background-color: #2E5D3A;
+            border-color: #2E5D3A;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a3621;
+            border-color: #1a3621;
+        }
+        
+        .recovery-link {
+            color: #2E5D3A;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .recovery-link:hover {
+            text-decoration: underline;
+            color: #1a3621;
+        }
+        
+        .credentials {
+            border-top: 1px solid #dee2e6;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        

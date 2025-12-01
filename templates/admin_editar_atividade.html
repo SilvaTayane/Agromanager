@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    #dynamic-content {
+        padding: 30px 40px;
+    }
+
+    .edit-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        max-width: 700px;
+        margin: auto;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        border-left: 4px solid #2E5D3A;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2E5D3A;
+    }
+
+    .form-control, .form-select, textarea {
+        border: 2px solid #2E5D3A;
+    }
+
+    .btn-main {
+        background-color: #2E5D3A;
+        color: white;
+        width: 100%;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 6px;
+        font-size: 17px;
+    }
+
+    .btn-main:hover {
+        background-color: #1f4129;
+    }
+
+    .back-btn {
+        text-decoration: none;
+        color: #2E5D3A;
+        font-weight: 600;
+    }
+
+    .back-btn:hover {
+        text-decoration: underline;
+    }
+</style>
+
+
+<div class="mb-4">
+    <h2 class="fw-bold">Editar Atividade</h2>
+    <a href="{% url 'listar_atividades_admin' %}" class="back-btn">
+        ← Voltar para lista
+    </a>
+</div>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="mb-4">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="edit-card">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- TÍTULO -->
+        <div class="mb-3">
+            <label class="form-label">Título *</label>
+            <input type="text" class="form-control" name="titulo" required
+                   value="{{ atividade.titulo }}">
+        </div>
+
+        <!-- DESCRIÇÃO -->
+        <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <textarea class="form-control" rows="3" name="descricao">{{ atividade.descricao }}</textarea>
+        </div>
+
+        <!-- TIPO -->
+        <div class="mb-3">
+            <label class="form-label">Tipo de Atividade *</label>
+            <select class="form-select" name="tipo_atividade" required>
+                <option value="AGRICOLA" {% if atividade.tipo_atividade == 'AGRICOLA' %}selected{% endif %}>Agrícola</option>
+                <option value="AGROPECUARIA" {% if atividade.tipo_atividade == 'AGROPECUARIA' %}selected{% endif %}>Agropecuária</option>
+                <option value="GERAL" {% if atividade.tipo_atividade == 'GERAL' %}selected{% endif %}>Geral</option>
+            </select>
+        </div>
+
+        <!-- PRIORIDADE -->
+        <div class="mb-3">
+            <label class="form-label">Prioridade *</label>
+            <select class="form-select" name="prioridade" required>
+                <option value="ALTA" {% if atividade.prioridade == 'ALTA' %}selected{% endif %}>Alta</option>
+                <option value="MEDIA" {% if atividade.prioridade == 'MEDIA' %}selected{% endif %}>Média</option>
+                <option value="BAIXA" {% if atividade.prioridade == 'BAIXA' %}selected{% endif %}>Baixa</option>
+            </select>
+        </div>
+
+        <!-- STATUS -->
+        <div class="mb-3">
+            <label class="form-label">Status *</label>
+            <select class="form-select" name="status" required>
+                {% for value, label in atividade.STATUS_CHOICES %}
+                <option value="{{ value }}" {% if atividade.status == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- RESPONSÁVEL -->
+        <div class="mb-3">
+            <label class="form-label">Responsável</label>
+            <select class="form-select" name="trabalhador">
+                <option value="">Nenhum responsável</option>
+                {% for trabalhador in trabalhadores %}
+                <option value="{{ trabalhador.id }}"
+                        {% if atividade.nome_trabalhador == trabalhador.nome %}selected{% endif %}>
+                    {{ trabalhador.nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- DATA LIMITE -->
+        <div class="mb-3">
+            <label class="form-label">Data Limite</label>
+            <input type="datetime-local" class="form-control" name="data_limite"
+                   value="{{ atividade.data_limite|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <!-- DESCRIÇÃO PROBLEMAS -->
+        <div class="mb-4">
+            <label class="form-label">Descrição de Problemas</label>
+            <textarea class="form-control" rows="3" name="descricao_problema">{{ atividade.descricao_problema|default_if_none:"" }}</textarea>
+        </div>
+
+        <!-- BOTÃO -->
+        <button type="submit" class="btn-main">
+            Atualizar Atividade
+        </button>
+    </form>
+
+</div>
+
+{% endblock %}

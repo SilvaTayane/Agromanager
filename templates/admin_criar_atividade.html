@@ -1,0 +1,316 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="container-fluid py-4">
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="h3 text-gray-900">Criar Nova Atividade</h1>
+      <p class="text-gray-600 mb-0">
+        Cadastre uma nova atividade para a fazenda
+      </p>
+    </div>
+
+    <!-- Botão Voltar -->
+    <a href="{% url 'listar_atividades_admin' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-2"></i>Voltar para Lista
+    </a>
+  </div>
+
+  <!-- Mensagens de Alerta -->
+  {% if messages %}
+  <div class="row mb-4">
+    <div class="col-12">
+      {% for message in messages %}
+      <div
+        class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show"
+        role="alert"
+      >
+        <i
+          class="bi {% if message.tags == 'error' %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %} me-2"
+        ></i>
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Formulário de Criação -->
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-plus-circle me-2"></i>Informações da Atividade
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" id="formAtividade">
+            {% csrf_token %}
+
+            <!-- Título -->
+            <div class="mb-3">
+              <label for="titulo" class="form-label">
+                Título da Atividade <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="titulo"
+                name="titulo"
+                placeholder="Ex: Vacinação do Lote A, Colheita do Milho..."
+                required
+                maxlength="200"
+              />
+              <div class="form-text">
+                Descreva brevemente a atividade a ser realizada
+              </div>
+            </div>
+
+            <!-- Descrição -->
+            <div class="mb-3">
+              <label for="descricao" class="form-label"
+                >Descrição Detalhada</label
+              >
+              <textarea
+                class="form-control"
+                id="descricao"
+                name="descricao"
+                rows="4"
+                placeholder="Forneça detalhes sobre a atividade, materiais necessários, localização, observações importantes..."
+              ></textarea>
+              <div class="form-text">
+                Informações adicionais que ajudem na execução da atividade
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Tipo de Atividade -->
+              <div class="col-md-6 mb-3">
+                <label for="tipo_atividade" class="form-label">
+                  Tipo de Atividade <span class="text-danger">*</span>
+                </label>
+                <select
+                  class="form-select"
+                  id="tipo_atividade"
+                  name="tipo_atividade"
+                  required
+                >
+                  <option value="" selected disabled>
+                    Selecione o tipo...
+                  </option>
+                  <option value="AGRICOLA">Agrícola</option>
+                  <option value="AGROPECUARIO">Agropecuária</option>
+                  <option value="OUTROS">Outros</option>
+                </select>
+              </div>
+
+              <!-- Prioridade -->
+              <div class="col-md-6 mb-3">
+                <label for="prioridade" class="form-label">
+                  Prioridade <span class="text-danger">*</span>
+                </label>
+                <select
+                  class="form-select"
+                  id="prioridade"
+                  name="prioridade"
+                  required
+                >
+                  <option value="" selected disabled>
+                    Selecione a prioridade...
+                  </option>
+                  <option value="ALTA">Alta</option>
+                  <option value="MEDIA">Média</option>
+                  <option value="BAIXA">Baixa</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Responsável -->
+              <div class="col-md-6 mb-3">
+                <label for="trabalhador" class="form-label"
+                  >Atribuir para</label
+                >
+                <select class="form-select" id="trabalhador" name="trabalhador">
+                  <option value="" selected>
+                    Não atribuir (deixar em aberto)
+                  </option>
+                  {% for trabalhador in trabalhadores %}
+                  <option value="{{ trabalhador.id }}">
+                    {{ trabalhador.nome }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="form-text">
+                  Opcional - pode ser atribuído posteriormente
+                </div>
+              </div>
+
+              <!-- Data Limite -->
+              <div class="col-md-6 mb-3">
+                <label for="data_limite" class="form-label">Data Limite</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="data_limite"
+                  name="data_limite"
+                />
+                <div class="form-text">
+                  Defina um prazo para conclusão da atividade
+                </div>
+              </div>
+            </div>
+
+            <!-- Visualização em Tempo Real -->
+            <div class="mb-4">
+              <div class="card bg-light">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="bi bi-eye me-2"></i>Pré-visualização
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="row small text-muted">
+                    <div class="col-md-6">
+                      <strong>Título:</strong>
+                      <span id="preview-titulo" class="text-dark">-</span>
+                    </div>
+                    <div class="col-md-3">
+                      <strong>Tipo:</strong>
+                      <span id="preview-tipo" class="text-dark">-</span>
+                    </div>
+                    <div class="col-md-3">
+                      <strong>Prioridade:</strong>
+                      <span id="preview-prioridade" class="text-dark">-</span>
+                    </div>
+                    <div class="col-12 mt-2">
+                      <strong>Responsável:</strong>
+                      <span id="preview-responsavel" class="text-dark"
+                        >Não atribuído</span
+                      >
+                    </div>
+                    <div class="col-12 mt-2">
+                      <strong>Data Limite:</strong>
+                      <span id="preview-data" class="text-dark"
+                        >Não definida</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="d-flex justify-content-between pt-3 border-top">
+              <a
+                href="{% url 'listar_atividades_admin' %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="bi bi-x-circle me-2"></i>Cancelar
+              </a>
+              <button type="submit" class="btn btn-primary-custom">
+                <i class="bi bi-check-circle me-2"></i>Criar Atividade
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .btn-primary-custom {
+    background-color: #2e5d3a;
+    border-color: #2e5d3a;
+    color: white;
+  }
+
+  .btn-primary-custom:hover {
+    background-color: #1a3621;
+    border-color: #1a3621;
+    color: white;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #2e5d3a;
+  }
+
+  .card {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.5rem;
+  }
+</style>
+
+<script>
+  // Atualização em tempo real da pré-visualização
+  document.addEventListener("DOMContentLoaded", function () {
+    const campos = [
+      "titulo",
+      "tipo_atividade",
+      "prioridade",
+      "trabalhador",
+      "data_limite",
+    ];
+
+    campos.forEach((campo) => {
+      const element = document.getElementById(campo);
+      if (element) {
+        element.addEventListener("input", atualizarPreview);
+        element.addEventListener("change", atualizarPreview);
+      }
+    });
+
+    function atualizarPreview() {
+      // Título
+      const titulo = document.getElementById("titulo").value || "-";
+      document.getElementById("preview-titulo").textContent = titulo;
+
+      // Tipo
+      const tipoSelect = document.getElementById("tipo_atividade");
+      const tipo = tipoSelect.options[tipoSelect.selectedIndex]?.text || "-";
+      document.getElementById("preview-tipo").textContent = tipo;
+
+      // Prioridade
+      const prioridadeSelect = document.getElementById("prioridade");
+      const prioridade =
+        prioridadeSelect.options[prioridadeSelect.selectedIndex]?.text || "-";
+      document.getElementById("preview-prioridade").textContent = prioridade;
+
+      // Responsável
+      const trabalhadorSelect = document.getElementById("trabalhador");
+      let responsavel = "Não atribuído";
+      if (trabalhadorSelect.value) {
+        responsavel =
+          trabalhadorSelect.options[trabalhadorSelect.selectedIndex].text;
+      }
+      document.getElementById("preview-responsavel").textContent = responsavel;
+
+      // Data Limite
+      const dataLimite = document.getElementById("data_limite").value;
+      if (dataLimite) {
+        const data = new Date(dataLimite);
+        document.getElementById("preview-data").textContent =
+          data.toLocaleDateString("pt-BR") +
+          " " +
+          data.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+      } else {
+        document.getElementById("preview-data").textContent = "Não definida";
+      }
+    }
+
+    // Inicializar preview
+    atualizarPreview();
+  });
+</script>
+{% endblock %}

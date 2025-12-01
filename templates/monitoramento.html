@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Título -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 text-gray-900">Monitoramento Climático</h1>
+            <p class="text-gray-600 mb-0">Acompanhe o clima da fazenda em tempo real</p>
+        </div>
+        
+    </div>
+
+    <!-- Links: Previsão e Histórico -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-2">
+            <a href="{% url 'previsao_semana' %}" class="btn btn-outline-primary w-100">
+                <i class="bi bi-cloud-sun me-2"></i>Previsão para 7 dias
+            </a>
+        </div>
+        <div class="col-md-6 mb-2">
+            <a href="{% url 'historico_clima_semanal' %}" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-clock-history me-2"></i>Histórico (7 dias)
+            </a>
+        </div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <a href="{% url 'historico_clima_mensal' %}" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-clock-history me-2"></i>Histórico (30 dias)
+            </a>
+        </div>
+    </div>
+
+    {% if erro %}
+        <div class="alert alert-danger">{{ erro }}</div>
+    {% endif %}
+
+    <!-- Clima Atual -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h4 class="text-gray-900 mb-3">Clima Atual</h4>
+
+            {% if temperatura %}
+                <div class="row">
+
+                    <!-- Temperatura -->
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="text-muted">Temperatura</h6>
+                            <p class="fs-4 fw-bold">{{ temperatura }} °C</p>
+                        </div>
+                    </div>
+
+                    <!-- Vento -->
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="text-muted">Vento</h6>
+                            <p class="fs-4 fw-bold">{{ vento }} km/h</p>
+                        </div>
+                    </div>
+
+                    <!-- Direção -->
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="text-muted">Direção</h6>
+                            <p class="fs-4 fw-bold">{{ direcao }}°</p>
+                        </div>
+                    </div>
+
+                    <!-- Condição -->
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="text-muted">Condição do tempo</h6>
+                            <p class="fs-5">{{ condicao_texto }}</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Alertas -->
+                <div class="mt-3">
+
+                    {% if temperatura > 35 %}
+                        <div class="alert alert-warning">
+                            ⚠️ Temperatura alta (> 35°C)
+                        </div>
+                    {% endif %}
+
+                    {% if vento > 40 %}
+                        <div class="alert alert-danger">
+                            ⚠️ Vento muito forte (> 40 km/h)
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            {% else %}
+                <p class="text-muted">Clique em "Atualizar Agora" para carregar os dados climáticos.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Informativo sobre coleta automática -->
+    <div class="alert alert-info mt-4">
+        <i class="bi bi-clock-history me-2"></i>
+        A coleta automática está ativa e é executada a cada <strong>6 horas</strong>.
+    </div>
+
+</div>
+
+{% endblock %}

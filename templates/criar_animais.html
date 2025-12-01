@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  .card {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  }
+  .nav-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 500;
+  }
+  .nav-tabs .nav-link.active {
+    color: #2e5d3a;
+    font-weight: 600;
+    border-bottom: 2px solid #2e5d3a;
+  }
+  .btn-success {
+    background-color: #2e5d3a;
+    border-color: #2e5d3a;
+  }
+  .btn-success:hover {
+    background-color: #1a3621;
+    border-color: #1a3621;
+  }
+  .form-label.required:after {
+    content: " *";
+    color: #dc3545;
+  }
+  .error-list {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  .is-invalid {
+    border-color: #dc3545;
+  }
+</style>
+
+<!-- Header com botão voltar -->
+<div class="d-flex align-items-center gap-4 mb-4 mx-5">
+  <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{% url 'listar_animais' %}'">
+    <i class="fas fa-arrow-left me-2"></i>
+    Voltar
+  </button>
+  <div>
+    <h1 class="text-dark mb-1" id="form-title">
+      {% if form.instance.pk %}Editar Animal{% else %}Cadastrar Novo Animal{% endif %}
+    </h1>
+    <p class="text-muted mb-0">Preencha os dados do animal</p>
+  </div>
+</div>
+
+<!-- Formulário -->
+<div class="mx-3">
+  <form id="animal-form" method="POST" action="">
+    {% csrf_token %}
+    
+    <!-- Exibir erros não relacionados a campos específicos -->
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Tabs de navegação -->
+    <ul class="nav nav-tabs mb-4" id="animalTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true">
+          Dados Básicos
+        </button>
+      </li>
+    </ul>
+
+    <!-- Conteúdo das tabs -->
+    <div class="tab-content" id="animalTabsContent">
+      <!-- Tab Dados Básicos -->
+      <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+        <!-- Card Informações Básicas -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-1">Informações Básicas</h5>
+            <p class="card-text text-muted small mb-0">Dados essenciais do animal</p>
+          </div>
+          <div class="card-body">
+            <!-- Linha 1: Nome e Número de Identificação -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="id_nome" class="form-label required">Nome</label>
+                <input type="text" 
+                       class="form-control {% if form.nome.errors %}is-invalid{% endif %}" 
+                       id="id_nome" 
+                       name="nome" 
+                       placeholder="Ex: Mimosa"
+                       value="{{ form.nome.value|default:'' }}"
+                       required>
+                {% if form.nome.errors %}
+                <div class="error-list">
+                  {% for error in form.nome.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              
+              <div class="col-md-6">
+                <label for="id_numero_identificacao" class="form-label">Número de Identificação</label>
+                <input type="text" 
+                       class="form-control {% if form.numero_identificacao.errors %}is-invalid{% endif %}" 
+                       id="id_numero_identificacao" 
+                       name="numero_identificacao" 
+                       placeholder="Ex: BV001"
+                       value="{{ form.numero_identificacao.value|default:'' }}">
+                {% if form.numero_identificacao.errors %}
+                <div class="error-list">
+                  {% for error in form.numero_identificacao.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Linha 2: Espécie e Raça -->
+            <div class="row g-3 mt-3">
+              <div class="col-md-6">
+                <label for="id_especie" class="form-label required">Espécie</label>
+                <input type="text" 
+                       class="form-control {% if form.especie.errors %}is-invalid{% endif %}" 
+                       id="id_especie" 
+                       name="especie" 
+                       placeholder="Ex: Bovino"
+                       value="{{ form.especie.value|default:'' }}"
+                       required>
+                {% if form.especie.errors %}
+                <div class="error-list">
+                  {% for error in form.especie.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="id_raca" class="form-label">Raça</label>
+                <input type="text" 
+                       class="form-control {% if form.raca.errors %}is-invalid{% endif %}" 
+                       id="id_raca" 
+                       name="raca" 
+                       placeholder="Ex: Nelore"
+                       value="{{ form.raca.value|default:'' }}">
+                {% if form.raca.errors %}
+                <div class="error-list">
+                  {% for error in form.raca.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Linha 3: Sexo, Data Nascimento, Peso -->
+            <div class="row g-3 mt-3">
+              <div class="col-md-4">
+                <label for="id_sexo" class="form-label required">Sexo</label>
+                <select class="form-select {% if form.sexo.errors %}is-invalid{% endif %}" 
+                        id="id_sexo" 
+                        name="sexo" 
+                        required>
+                  <option value="" selected disabled>Selecione</option>
+                  <option value="Macho" {% if form.sexo.value == "Macho" %}selected{% endif %}>Macho</option>
+                  <option value="Fêmea" {% if form.sexo.value == "Fêmea" %}selected{% endif %}>Fêmea</option>
+                </select>
+                {% if form.sexo.errors %}
+                <div class="error-list">
+                  {% for error in form.sexo.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div class="col-md-4">
+                <label for="id_data_nascimento" class="form-label required">Data de Nascimento</label>
+                <input type="date" 
+                       class="form-control {% if form.data_nascimento.errors %}is-invalid{% endif %}" 
+                       id="id_data_nascimento" 
+                       name="data_nascimento" 
+                       value="{{ form.data_nascimento.value|default:'' }}"
+                       required>
+                {% if form.data_nascimento.errors %}
+                <div class="error-list">
+                  {% for error in form.data_nascimento.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div class="col-md-4">
+                <label for="id_peso_inicial" class="form-label">Peso Inicial (kg)</label>
+                <input type="number" 
+                       class="form-control {% if form.peso_inicial.errors %}is-invalid{% endif %}" 
+                       id="id_peso_inicial" 
+                       name="peso_inicial" 
+                       placeholder="Ex: 450"
+                       step="0.01"
+                       value="{{ form.peso_inicial.value|default:'' }}">
+                {% if form.peso_inicial.errors %}
+                <div class="error-list">
+                  {% for error in form.peso_inicial.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Linha 4: Finalidade -->
+            <div class="row g-3 mt-3">
+              <div class="col-md-6">
+                <label for="id_finalidade" class="form-label">Finalidade</label>
+                <select class="form-select {% if form.finalidade.errors %}is-invalid{% endif %}" 
+                        id="id_finalidade" 
+                        name="finalidade">
+                  <option value="" selected disabled>Selecione a finalidade</option>
+                  <option value="Leite" {% if form.finalidade.value == "Leite" %}selected{% endif %}>Leite</option>
+                  <option value="Corte" {% if form.finalidade.value == "Corte" %}selected{% endif %}>Corte</option>
+                  <option value="Reprodução" {% if form.finalidade.value == "Reprodução" %}selected{% endif %}>Reprodução</option>
+                  <option value="Venda" {% if form.finalidade.value == "Venda" %}selected{% endif %}>Venda</option>
+                </select>
+                {% if form.finalidade.errors %}
+                <div class="error-list">
+                  {% for error in form.finalidade.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Saúde e Observações -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h5 class="card-title mb-1">Saúde e Observações</h5>
+            <p class="card-text text-muted small mb-0">Informações sobre saúde e observações gerais</p>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="id_observacoes" class="form-label">Observações</label>
+              <textarea class="form-control {% if form.observacoes.errors %}is-invalid{% endif %}" 
+                        id="id_observacoes" 
+                        name="observacoes" 
+                        rows="6"
+                        placeholder="Histórico médico, tratamentos, vacinas, comportamento, etc.">{{ form.observacoes.value|default:'' }}</textarea>
+              {% if form.observacoes.errors %}
+              <div class="error-list">
+                {% for error in form.observacoes.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Dados de Aquisição -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h5 class="card-title mb-1">Dados de Aquisição</h5>
+            <p class="card-text text-muted small mb-0">Informações sobre a origem do animal</p>
+          </div>
+          <div class="card-body">
+            <!-- Linha 1: Origem e Data Aquisição -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="id_origem" class="form-label">Origem</label>
+                <select class="form-select {% if form.origem.errors %}is-invalid{% endif %}" 
+                        id="id_origem" 
+                        name="origem">
+                  <option value="" selected disabled>Selecione a origem</option>
+                  <option value="Compra" {% if form.origem.value == "Compra" %}selected{% endif %}>Compra</option>
+                  <option value="Nascimento Interno" {% if form.origem.value == "Nascimento Interno" %}selected{% endif %}>Nascimento Interno</option>
+                  <option value="Doação" {% if form.origem.value == "Doação" %}selected{% endif %}>Doação</option>
+                </select>
+                {% if form.origem.errors %}
+                <div class="error-list">
+                  {% for error in form.origem.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="id_data_aquisicao" class="form-label">Data de Aquisição</label>
+                <input type="date" 
+                       class="form-control {% if form.data_aquisicao.errors %}is-invalid{% endif %}" 
+                       id="id_data_aquisicao" 
+                       name="data_aquisicao" 
+                       value="{{ form.data_aquisicao.value|default:'' }}">
+                {% if form.data_aquisicao.errors %}
+                <div class="error-list">
+                  {% for error in form.data_aquisicao.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Linha 2: Valor Compra -->
+            <div class="row g-3 mt-3">
+              <div class="col-md-6">
+                <label for="id_valor_compra" class="form-label">Valor de Compra (R$)</label>
+                <input type="number" 
+                       class="form-control {% if form.valor_compra.errors %}is-invalid{% endif %}" 
+                       id="id_valor_compra" 
+                       name="valor_compra" 
+                       placeholder="Ex: 5000.00"
+                       step="0.01"
+                       value="{{ form.valor_compra.value|default:'' }}">
+                {% if form.valor_compra.errors %}
+                <div class="error-list">
+                  {% for error in form.valor_compra.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="d-flex justify-content-end gap-3 mt-4">
+      <a href="{% url 'listar_animais' %}" class="btn btn-outline-secondary">
+        Cancelar
+      </a>
+      <button type="submit" class="btn btn-success" id="submit-btn">
+        <i class="fas fa-save me-2"></i>
+        <span id="submit-text">
+          {% if form.instance.pk %}Atualizar Animal{% else %}Salvar Animal{% endif %}
+        </span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Definir data máxima como hoje para data de nascimento e aquisição
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("id_data_nascimento").setAttribute("max", today);
+    document.getElementById("id_data_aquisicao").setAttribute("max", today);
+
+    // Verificar origem e mostrar/ocultar campos obrigatórios
+    const origemSelect = document.getElementById('id_origem');
+    
+    function toggleAcquisitionFields() {
+      const valorCompraField = document.getElementById('id_valor_compra');
+      const dataAquisicaoField = document.getElementById('id_data_aquisicao');
+      
+      if (origemSelect && origemSelect.value === 'Compra') {
+        if (valorCompraField) valorCompraField.required = true;
+        if (dataAquisicaoField) dataAquisicaoField.required = true;
+      } else {
+        if (valorCompraField) valorCompraField.required = false;
+        if (dataAquisicaoField) dataAquisicaoField.required = false;
+      }
+    }
+
+    if (origemSelect) {
+      origemSelect.addEventListener('change', toggleAcquisitionFields);
+      toggleAcquisitionFields(); // Executar na carga inicial
+    }
+
+    // Loading no botão de submit
+    document.getElementById('animal-form').addEventListener('submit', function() {
+      const submitBtn = document.getElementById("submit-btn");
+      const submitText = document.getElementById("submit-text");
+      
+      if (submitBtn && submitText) {
+        submitBtn.disabled = true;
+        submitText.textContent = "Salvando...";
+      }
+    });
+  });
+</script>
+{% endblock %}

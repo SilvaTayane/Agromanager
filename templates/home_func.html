@@ -1,0 +1,437 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+        
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+        
+        .space-y-3 > * + * {
+            margin-top: 0.75rem;
+        }
+        
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .column-header {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+        }
+        
+        .bg-gray-100 {
+            background-color: #f3f4f6;
+        }
+        
+        .bg-blue-100 {
+            background-color: #dbeafe;
+        }
+        
+        .bg-green-100 {
+            background-color: #dcfce7;
+        }
+        
+        .priority-high {
+            background-color: #fecaca;
+            color: #dc2626;
+        }
+        
+        .priority-medium {
+            background-color: #fed7aa;
+            color: #ea580c;
+        }
+        
+        .priority-low {
+            background-color: #bbf7d0;
+            color: #16a34a;
+        }
+        
+        .btn-primary {
+            background-color: #2E5D3A;
+            border-color: #2E5D3A;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a3621;
+            border-color: #1a3621;
+        }
+        
+        .modal-content {
+            max-width: 28rem;
+            margin: 0 auto;
+        }
+        
+        .dropdown-menu {
+            min-width: 12rem;
+        }
+    </style>
+
+    <div class="container-fluid space-y-6">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="text-gray-900">Gerenciamento de Tarefas</h1>
+                <p class="text-gray-600">Organize e acompanhe as atividades da fazenda</p>
+            </div>
+            
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#taskModal">
+                <i class="bi bi-plus me-2"></i>
+                Nova Tarefa
+            </button>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="space-y-4">
+                    <div class="column-header bg-gray-100">
+                        <h3 class="text-gray-900">Pendentes</h3>
+                        <p class="text-sm text-gray-600 mb-0" id="pending-count">0 tarefa(s)</p>
+                    </div>
+
+                    <div class="space-y-3" id="pending-tasks">
+                        <!-- Tarefas pendentes serão inseridas aqui -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="space-y-4">
+                    <div class="column-header bg-blue-100">
+                        <h3 class="text-gray-900">Em Andamento</h3>
+                        <p class="text-sm text-gray-600 mb-0" id="in-progress-count">0 tarefa(s)</p>
+                    </div>
+
+                    <div class="space-y-3" id="in-progress-tasks">
+                        <!-- Tarefas em andamento serão inseridas aqui -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="space-y-4">
+                    <div class="column-header bg-green-100">
+                        <h3 class="text-gray-900">Concluídas</h3>
+                        <p class="text-sm text-gray-600 mb-0" id="completed-count">0 tarefa(s)</p>
+                    </div>
+
+                    <div class="space-y-3" id="completed-tasks">
+                        <!-- Tarefas concluídas serão inseridas aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para criar nova tarefa -->
+    <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskModalLabel">Criar Nova Tarefa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Preencha os dados da tarefa e atribua a um funcionário</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="title" class="form-label">Título *</label>
+                            <input type="text" class="form-control" id="title" placeholder="Nome da tarefa">
+                        </div>
+                        <div>
+                            <label for="description" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="description" rows="3" placeholder="Detalhes da tarefa"></textarea>
+                        </div>
+                        <div>
+                            <label for="type" class="form-label">Tipo</label>
+                            <input type="text" class="form-control" id="type" placeholder="Ex: Saúde, Manutenção">
+                        </div>
+                        <div>
+                            <label for="assignedTo" class="form-label">Atribuir a *</label>
+                            <select class="form-select" id="assignedTo">
+                                <option selected disabled>Selecione um funcionário</option>
+                                <option value="João Silva">João Silva</option>
+                                <option value="Maria Santos">Maria Santos</option>
+                                <option value="Pedro Costa">Pedro Costa</option>
+                                <option value="Ana Lima">Ana Lima</option>
+                            </select>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label">Prioridade</label>
+                                <select class="form-select" id="priority">
+                                    <option value="low">Baixa</option>
+                                    <option value="medium" selected>Média</option>
+                                    <option value="high">Alta</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="dueDate" class="form-label">Data Limite *</label>
+                                <input type="date" class="form-control" id="dueDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="createTaskBtn">Criar Tarefa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        // Dados iniciais
+        let tasks = [];
+        let taskIdCounter = 1;
+        const userRole = 'admin'; // ou 'employee'
+
+        // Elementos DOM
+        const pendingTasksContainer = document.getElementById('pending-tasks');
+        const inProgressTasksContainer = document.getElementById('in-progress-tasks');
+        const completedTasksContainer = document.getElementById('completed-tasks');
+        const pendingCount = document.getElementById('pending-count');
+        const inProgressCount = document.getElementById('in-progress-count');
+        const completedCount = document.getElementById('completed-count');
+        const createTaskBtn = document.getElementById('createTaskBtn');
+        const taskModal = document.getElementById('taskModal');
+
+        // Função para renderizar tarefas
+        function renderTasks() {
+            // Limpar containers
+            pendingTasksContainer.innerHTML = '';
+            inProgressTasksContainer.innerHTML = '';
+            completedTasksContainer.innerHTML = '';
+            
+            // Contadores
+            let pendingCountValue = 0;
+            let inProgressCountValue = 0;
+            let completedCountValue = 0;
+            
+            // Renderizar cada tarefa
+            tasks.forEach(task => {
+                const taskElement = createTaskElement(task);
+                
+                if (task.status === 'pending') {
+                    pendingTasksContainer.appendChild(taskElement);
+                    pendingCountValue++;
+                } else if (task.status === 'in-progress') {
+                    inProgressTasksContainer.appendChild(taskElement);
+                    inProgressCountValue++;
+                } else if (task.status === 'completed') {
+                    completedTasksContainer.appendChild(taskElement);
+                    completedCountValue++;
+                }
+            });
+            
+            // Atualizar contadores
+            pendingCount.textContent = `${pendingCountValue} tarefa(s)`;
+            inProgressCount.textContent = `${inProgressCountValue} tarefa(s)`;
+            completedCount.textContent = `${completedCountValue} tarefa(s)`;
+        }
+
+        // Função para criar elemento de tarefa
+        function createTaskElement(task) {
+            const taskCard = document.createElement('div');
+            taskCard.className = 'card';
+            taskCard.dataset.taskId = task.id;
+            
+            // Determinar cor da prioridade
+            let priorityClass = '';
+            let priorityText = '';
+            if (task.priority === 'high') {
+                priorityClass = 'priority-high';
+                priorityText = 'Alta';
+            } else if (task.priority === 'medium') {
+                priorityClass = 'priority-medium';
+                priorityText = 'Média';
+            } else {
+                priorityClass = 'priority-low';
+                priorityText = 'Baixa';
+            }
+            
+            // Formatar data
+            const dueDate = new Date(task.dueDate);
+            const formattedDate = dueDate.toLocaleDateString('pt-BR');
+            
+            // Determinar texto e ação do botão para funcionários
+            let employeeButton = '';
+            if (userRole === 'employee' && task.status !== 'completed') {
+                const buttonText = task.status === 'pending' ? 'Iniciar' : 'Concluir';
+                const nextStatus = task.status === 'pending' ? 'in-progress' : 'completed';
+                employeeButton = `
+                    <button class="btn btn-outline-secondary btn-sm w-100" onclick="handleStatusChange(${task.id}, '${nextStatus}')">
+                        ${buttonText}
+                    </button>
+                `;
+            }
+            
+            taskCard.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">${task.title}</h5>
+                        ${userRole === 'admin' ? `
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                ${task.status !== 'in-progress' ? `<li><a class="dropdown-item" href="#" onclick="handleStatusChange(${task.id}, 'in-progress')">Mover para Em Andamento</a></li>` : ''}
+                                ${task.status !== 'completed' ? `<li><a class="dropdown-item" href="#" onclick="handleStatusChange(${task.id}, 'completed')">Marcar como Concluído</a></li>` : ''}
+                                ${task.status !== 'pending' ? `<li><a class="dropdown-item" href="#" onclick="handleStatusChange(${task.id}, 'pending')">Voltar para Pendente</a></li>` : ''}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="handleDeleteTask(${task.id})">Excluir</a></li>
+                            </ul>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <p class="card-text text-muted">${task.description}</p>
+                    
+                    <div class="mb-3">
+                        <span class="badge ${priorityClass} me-1">${priorityText}</span>
+                        ${task.type ? `<span class="badge bg-light text-dark border">${task.type}</span>` : ''}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between text-muted small mb-3">
+                        <div>
+                            <i class="bi bi-person me-1"></i>
+                            ${task.assignedTo}
+                        </div>
+                        <div>
+                            <i class="bi bi-calendar me-1"></i>
+                            ${formattedDate}
+                        </div>
+                    </div>
+                    
+                    ${employeeButton}
+                </div>
+            `;
+            
+            return taskCard;
+        }
+
+        // Função para criar nova tarefa
+        function handleCreateTask() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const type = document.getElementById('type').value;
+            const assignedTo = document.getElementById('assignedTo').value;
+            const priority = document.getElementById('priority').value;
+            const dueDate = document.getElementById('dueDate').value;
+            
+            // Validação básica
+            if (!title || !assignedTo || !dueDate) {
+                alert('Por favor, preencha os campos obrigatórios (Título, Atribuir a, Data Limite)');
+                return;
+            }
+            
+            // Criar nova tarefa
+            const newTask = {
+                id: taskIdCounter++,
+                title,
+                description,
+                type,
+                assignedTo,
+                priority,
+                dueDate,
+                status: 'pending'
+            };
+            
+            tasks.push(newTask);
+            renderTasks();
+            
+            // Fechar modal e limpar campos
+            const modal = bootstrap.Modal.getInstance(taskModal);
+            modal.hide();
+            
+            document.getElementById('title').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('type').value = '';
+            document.getElementById('assignedTo').selectedIndex = 0;
+            document.getElementById('priority').value = 'medium';
+            document.getElementById('dueDate').value = '';
+        }
+
+        // Função para alterar status da tarefa
+        function handleStatusChange(taskId, newStatus) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].status = newStatus;
+                renderTasks();
+            }
+        }
+
+        // Função para excluir tarefa
+        function handleDeleteTask(taskId) {
+            if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                renderTasks();
+            }
+        }
+
+        // Adicionar tarefas de exemplo
+        function addSampleTasks() {
+            tasks = [
+                {
+                    id: taskIdCounter++,
+                    title: 'Inspecionar plantação de milho',
+                    description: 'Verificar se há pragas ou doenças nas plantas',
+                    type: 'Inspeção',
+                    assignedTo: 'João Silva',
+                    priority: 'high',
+                    dueDate: '2023-12-15',
+                    status: 'pending'
+                },
+                {
+                    id: taskIdCounter++,
+                    title: 'Manutenção no trator',
+                    description: 'Trocar óleo e verificar pneus',
+                    type: 'Manutenção',
+                    assignedTo: 'Pedro Costa',
+                    priority: 'medium',
+                    dueDate: '2023-12-20',
+                    status: 'in-progress'
+                },
+                {
+                    id: taskIdCounter++,
+                    title: 'Colheita de soja',
+                    description: 'Iniciar colheita no campo norte',
+                    type: 'Colheita',
+                    assignedTo: 'Maria Santos',
+                    priority: 'high',
+                    dueDate: '2023-12-10',
+                    status: 'completed'
+                }
+            ];
+            
+            renderTasks();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            addSampleTasks();
+            
+            createTaskBtn.addEventListener('click', handleCreateTask);
+            
+            // Se o usuário for funcionário, esconder o botão de nova tarefa
+            if (userRole === 'employee') {
+                document.querySelector('.btn-primary').style.display = 'none';
+            }
+        });
+    </script>
+
+
+{% endblock %}

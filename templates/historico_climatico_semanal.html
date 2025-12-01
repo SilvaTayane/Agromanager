@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <h1 class="h3 mb-4 text-gray-900">📊 Histórico Climático (7 dias)</h1>
+
+    <!-- Tabela com registros -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <h4 class="mb-3">Registros coletados</h4>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Temperatura (°C)</th>
+                            <th>Vento (km/h)</th>
+                            <th>Direção (°)</th>
+                            <th>Origem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in registros %}
+                        <tr>
+                            <td>{{ r.data_coleta|date:"d/m/Y H:i" }}</td>
+                            <td>{{ r.temperatura }}</td>
+                            <td>{{ r.vento }}</td>
+                            <td>{{ r.direcao }}</td>
+                            <td>{{ r.origem }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Nenhum registro encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Médias por dia -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h4 class="mb-3">Médias de temperatura por dia</h4>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Dia</th>
+                            <th>Temperatura Média (°C)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in medias_por_dia %}
+                        <tr>
+                            <td>{{ item.dia }}</td>
+                            <td>{{ item.media_temp|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

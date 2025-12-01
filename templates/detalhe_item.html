@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalhes do Item</h2>
+
+    <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Nome:</strong> {{ item.nome }}</li>
+        <li class="list-group-item"><strong>Categoria:</strong> {{ item.categoria.nome }}</li>
+        <li class="list-group-item"><strong>Quantidade Atual:</strong> {{ item.quantidade_atual }}</li>
+        <li class="list-group-item"><strong>Descrição:</strong> {{ item.descricao }}</li>
+    </ul>
+
+    <a href="{% url 'edit_item' item.id %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'list_items' %}" class="btn btn-secondary">Voltar</a>
+</div>
+{% endblock %}

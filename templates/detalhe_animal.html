@@ -1,0 +1,297 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<!-- CSS Customizado -->
+<style>
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
+
+.text-gray-900 {
+    color: #1f2937;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+.text-gray-700 {
+    color: #374151;
+}
+
+.bg-green-600 {
+    background-color: #2E5D3A;
+    border-color: #2E5D3A;
+}
+
+.bg-green-600:hover {
+    background-color: #1a3621;
+    border-color: #1a3621;
+}
+
+.bg-green-100 {
+    background-color: #dcfce7;
+}
+
+.text-green-800 {
+    color: #166534;
+}
+
+.border-green-600 {
+    border-color: #2E5D3A;
+}
+
+.text-green-600 {
+    color: #2E5D3A;
+}
+
+.nav-tabs .nav-link.active {
+    color: #2E5D3A;
+    border-bottom: 2px solid #2E5D3A;
+}
+
+.nav-tabs .nav-link {
+    color: #6b7280;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #2E5D3A;
+}
+</style>
+
+<!-- Template HTML -->
+<div class="space-y-6">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-4">
+            <button class="btn btn-outline-secondary" onclick="onBack()">
+                <i class="bi bi-arrow-left me-2"></i>
+                Voltar
+            </button>
+            <div>
+                <h1 class="text-gray-900 mb-0">{{ animal.nome }}</h1>
+                <p class="text-gray-600 mb-0">ID: {{ animal.numero_identificacao }}</p>
+            </div>
+        </div>
+        <button class="btn bg-green-600 text-white" onclick="onEdit({{ animal.id }})">
+            <i class="bi bi-pencil me-2"></i>
+            Editar
+        </button>
+        
+    </div>
+
+    <!-- Cards de Informações -->
+    <div class="row g-4">
+        <!-- Informações Básicas -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informações Básicas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Espécie</p>
+                        <p class="mb-0">{{ animal.especie }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Raça</p>
+                        <p class="mb-0">{{ animal.raca|default:"-" }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Sexo</p>
+                        <p class="mb-0">{{ animal.sexo }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Data de Nascimento</p>
+                        <p class="mb-0">{{ animal.data_nascimento|date:"d/m/Y" }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-0">
+                        <p class="text-muted small mb-1">Peso Inicial</p>
+                        <p class="mb-0">{{ animal.peso_inicial|default:"-" }} kg</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status e Localização -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Status e Finalidade</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="text-muted small mb-2">Status Atual</p>
+                        <span class="badge bg-green-100 text-green-800">
+                            {{ animal.status|default:"Saudável" }}
+                        </span>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <p class="text-muted small mb-2">Localização</p>
+                        <div class="d-flex align-items-center text-gray-900">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            {{ animal.localizacao|default:"Não informada" }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-0">
+                        <p class="text-muted small mb-1">Finalidade</p>
+                        <p class="mb-0">{{ animal.finalidade|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados de Aquisição -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dados de Aquisição</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Valor de Aquisição</p>
+                        <p class="mb-0">R$ {{ animal.valor_compra }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Origem</p>
+                        <p class="mb-0">{{ animal.origem|default:"-" }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <p class="text-muted small mb-1">Data de Aquisição</p>
+                        <p class="mb-0">{{ animal.data_aquisicao|date:"d/m/Y"|default:"-" }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-0">
+                        <p class="text-muted small mb-1">Data de Cadastro</p>
+                        <p class="mb-0">{{ animal.data_criacao|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Abas -->
+    <ul class="nav nav-tabs" id="animalTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="health-tab" data-bs-toggle="tab" data-bs-target="#health" type="button" role="tab">
+                Histórico de Saúde
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="movements-tab" data-bs-toggle="tab" data-bs-target="#movements" type="button" role="tab">
+                Movimentações
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="observations-tab" data-bs-toggle="tab" data-bs-target="#observations" type="button" role="tab">
+                Observações
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="animalTabsContent">
+        <!-- Histórico de Saúde -->
+        <div class="tab-pane fade show active" id="health" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Histórico de Saúde</h5>
+                </div>
+                <div class="card-body">
+                    <div class="space-y-4">
+                        {% for record in health_history %}
+                        <div class="d-flex align-items-start gap-3 pb-3 border-bottom">
+                            <i class="bi bi-activity text-green-600 mt-1"></i>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <p class="text-gray-900 mb-0">{{ record.evento }}</p>
+                                    <span class="badge border border-green-600 text-green-600">
+                                        {{ record.status }}
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 text-muted small">
+                                    <i class="bi bi-calendar"></i>
+                                    {{ record.data|date:"d/m/Y" }}
+                                </div>
+                                {% if record.observacoes %}
+                                <p class="text-muted small mt-1 mb-0">{{ record.observacoes }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center py-3">Nenhum registro de saúde encontrado.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Histórico de Movimentações -->
+        <div class="tab-pane fade" id="movements" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Histórico de Movimentações</h5>
+                </div>
+                <div class="card-body">
+                    <div class="space-y-4">
+                        {% for record in movement_history %}
+                        <div class="d-flex align-items-start gap-3 pb-3 border-bottom">
+                            <i class="bi bi-geo-alt text-green-600 mt-1"></i>
+                            <div class="flex-grow-1">
+                                <div class="mb-1">
+                                    <p class="text-gray-900 mb-1">
+                                        <span class="text-muted">De:</span> {{ record.de }} 
+                                        <span class="mx-2">→</span> 
+                                        <span class="text-muted">Para:</span> {{ record.para }}
+                                    </p>
+                                    <p class="text-muted small mb-0">{{ record.motivo }}</p>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 text-muted small">
+                                    <i class="bi bi-calendar"></i>
+                                    {{ record.data|date:"d/m/Y" }}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center py-3">Nenhuma movimentação registrada.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="tab-pane fade" id="observations" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Observações</h5>
+                </div>
+                <div class="card-body">
+                    {% if animal.observacoes %}
+                    <p class="text-gray-700">{{ animal.observacoes }}</p>
+                    {% else %}
+                    <p class="text-muted text-center">Nenhuma observação registrada.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+function onBack() {
+    window.history.back();
+}
+
+function onEdit(animalId) {
+    window.location.href = `/animais/${animalId}/editar/`;
+}
+</script>
+
+{% endblock %}

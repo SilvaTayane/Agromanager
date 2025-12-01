@@ -1,0 +1,17 @@
+virtual/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+*.log
+.git/
+.gitignore
+media/
+staticfiles/
+node_modules/
+.vscode/
+.idea/

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            Excluir Item
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Atenção!</h5>
+            <p class="card-text">Tem certeza que deseja excluir o item <strong>{{ item.nome }}</strong>? Esta ação não pode ser desfeita.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                <a href="{% url 'listar_estoque' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

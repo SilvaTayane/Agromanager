@@ -1,0 +1,155 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5 mb-5">
+  <!-- MENU SUPERIOR -->
+  <div class="d-flex justify-content-center mb-4">
+    <a href="{% url 'listar_atividades_admin' %}" class="btn btn-success px-4">
+      Voltar ao Menu Principal
+    </a>
+    <a href="{% url 'listar_atividades_admin' %}" class="btn btn-success px-4">
+      visão admin
+    </a>
+  </div>
+
+  <!-- SEÇÃO: Seleção do Trabalhador -->
+  <div class="card shadow-sm border-success mb-4">
+    <div class="card-body">
+      <h2 class="text-center mb-3">Acessar Área do Trabalhador</h2>
+      <p class="text-center text-muted mb-4">
+        Selecione seu nome para visualizar suas atividades
+      </p>
+
+      <form method="POST" class="mx-auto" style="max-width: 400px">
+        {% csrf_token %}
+
+        <label for="trabalhador" class="form-label fw-bold text-success">
+          Selecione seu nome:
+        </label>
+
+        <select
+          id="trabalhador"
+          name="trabalhador"
+          class="form-select mb-3"
+          required
+        >
+          <option value="">-- Selecione um trabalhador --</option>
+          {% for trabalhador in trabalhadores %}
+          <option value="{{ trabalhador.nome }}">{{ trabalhador.nome }}</option>
+          {% endfor %}
+        </select>
+
+        <button class="btn btn-success w-100 py-2" type="submit">
+          Acessar Minhas Atividades
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {% if trabalhador_selecionado %}
+  <!-- ÁREA DO TRABALHADOR -->
+  <div class="card border-primary shadow-sm">
+    <div class="card-body">
+      <!-- HEADER DO TRABALHADOR -->
+      <div class="text-center mb-4 pb-3 border-bottom">
+        <h3 class="text-success">
+          Olá, <strong>{{ trabalhador_selecionado.nome }}</strong>!
+        </h3>
+        <!-- prettier-ignore -->
+        <p class="text-muted">
+          {% if total_atividades > 0 %} Você tem <strong>{{ total_atividades }}</strong> atividade(s) atribuída(s) {% else %} Sua área de atividades {% endif %}
+        </p>
+      </div>
+
+      <!-- LISTA DE ATIVIDADES -->
+      <div>
+        {% if atividades %} {% for atividade in atividades %}
+        <div class="card mb-3 shadow-sm atividade-card">
+          <div class="card-body">
+            <!-- Título + Botão -->
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="text-success fw-bold">{{ atividade.titulo }}</h5>
+
+              <a
+                href="{% url 'atualizar_status' atividade.id_atividade trabalhador_selecionado.nome %}"
+                class="btn btn-warning btn-sm"
+              >
+                Atualizar Status
+              </a>
+            </div>
+
+            <!-- Badges -->
+            <div class="mb-3 d-flex flex-wrap gap-2">
+              <span class="badge bg-info text-dark">
+                {{ atividade.get_tipo_atividade_display }}
+              </span>
+
+              <span
+                class="badge {% if atividade.prioridade == 'ALTA' %}bg-danger {% elif atividade.prioridade == 'MEDIA' %}bg-warning text-dark {% else %}bg-success {% endif %}"
+              >
+                {{ atividade.get_prioridade_display }}
+              </span>
+
+              <span class="badge bg-purple text-light">
+                {{ atividade.get_status_display }}
+              </span>
+
+              {% if atividade.esta_atrasada %}
+              <span class="badge bg-danger"> Atrasada </span>
+              {% endif %}
+            </div>
+
+            <!-- Descrição -->
+            {% if atividade.descricao %}
+            <p class="text-muted mb-2">
+              <strong>Descrição:</strong> {{ atividade.descricao }}
+            </p>
+            {% endif %}
+
+            <!-- Problema -->
+            {% if atividade.descricao_problema %}
+            <div class="alert alert-warning py-2">
+              <strong>Problemas Reportados:</strong><br />
+              {{ atividade.descricao_problema }}
+            </div>
+            {% endif %}
+
+            <!-- Rodapé -->
+            <div
+              class="small text-muted border-top pt-2 mt-3 d-flex flex-wrap gap-3"
+            >
+              <div>
+                <strong>Status Atual:</strong>
+                {{ atividade.get_status_display }}
+              </div>
+              <div>
+                <strong>Criado em:</strong>
+                {{ atividade.data_criacao|date:"d/m/Y H:i" }}
+              </div>
+              {% if atividade.data_limite %}
+              <div>
+                <strong>Data Limite:</strong>
+                <span
+                  class="{% if atividade.esta_atrasada %}text-danger fw-bold{% endif %}"
+                >
+                  {{ atividade.data_limite|date:"d/m/Y H:i" }}
+                </span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+
+        <!-- SEM TAREFAS -->
+        <div class="text-center py-5 text-muted">
+          <h4 class="mb-2">Nenhuma Tarefa Pendente</h4>
+          <p>Você não possui atividades atribuídas no momento.</p>
+        </div>
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

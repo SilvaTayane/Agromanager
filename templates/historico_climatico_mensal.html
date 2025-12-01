@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">Histórico Climático - {{ periodo }}</h2>
+
+    <h4 class="mt-4">Médias por dia</h4>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Dia</th>
+                <th>Temperatura média (°C)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in medias_por_dia %}
+            <tr>
+                <td>{{ item.dia }}</td>
+                <td>{{ item.media_temp|floatformat:1 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4 class="mt-4">Registros</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Data/Hora</th>
+                <th>Temperatura</th>
+                <th>Umidade</th>
+                <th>Vento</th>
+                <th>Condição</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in registros %}
+            <tr>
+                <td>{{ r.data_coleta }}</td>
+                <td>{{ r.temperatura }} °C</td>
+                <td>{{ r.umidade }}%</td>
+                <td>{{ r.vento }} km/h</td>
+                <td>{{ r.get_condicao_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

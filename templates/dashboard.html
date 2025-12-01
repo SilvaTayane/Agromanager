@@ -1,0 +1,235 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<style>
+  /* Estilos personalizados para complementar o Bootstrap */
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .transition-shadow {
+    transition: box-shadow 0.3s ease-in-out;
+  }
+
+  .text-purple {
+    color: oklch(0.558 0.288 302.321);
+  }
+
+  .bg-purple {
+    background-color: oklch(0.977 0.014 308.299);
+  }
+
+  .activity-list .border-bottom:last-of-type {
+    border-bottom: none !important;
+  }
+</style>
+<!-- Stats Grid -->
+<div class="row g-4 m-2">
+  <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="card h-100 cursor-pointer hover-shadow transition-shadow"
+      onclick="onNavigate('animals')"
+    >
+      <!-- ADICIONAR URL AQUI -->
+
+      <div class="card-body">
+        <a  class="text-decoration-none" href="{% url 'listar_animais' %}">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-subtitle text-muted mb-0">Total de Animais</h6>
+            <div class="bg-primary text-white p-2 rounded">
+              <i class="fas fa-cow"></i>
+            </div>
+          </div>
+          <h3 class="card-title text-dark">{{ total_animais }}</h3>
+          <!-- <p class="card-text small text-muted mt-1">+12 desde a última semana</p> -->
+          <p class="card-text small text-muted mt-1">1 com localização</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="card h-100 cursor-pointer hover-shadow transition-shadow"
+      onclick="onNavigate('tasks')"
+    >
+      <div class="card-body">
+        <a  class="text-decoration-none" href="{% url 'listar_atividades_admin' %}">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-subtitle text-muted mb-0">Tarefas Pendentes</h6>
+            <div class="bg-warning text-white p-2 rounded">
+              <i class="fas fa-list-check"></i>
+            </div>
+          </div>
+          <h3 class="card-title text-dark">{{ tarefas_pendentes }}</h3>
+          <p class="card-text small text-muted mt-1">{{ tarefas_urgentes }} urgentes</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="card h-100 cursor-pointer hover-shadow transition-shadow"
+      onclick="onNavigate('stock')"
+    >
+      <div class="card-body">
+        <a  class="text-decoration-none" href="{% url 'listar_estoque' %}">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-subtitle text-muted mb-0">Itens em Estoque</h6>
+            <div class="bg-success text-white p-2 rounded">
+              <i class="fas fa-box"></i>
+            </div>
+          </div>
+          <h3 class="card-title text-dark">{{ itens_estoque }}</h3>
+          <p class="card-text small text-muted mt-1">{{ itens_baixo_estoque }} precisam de reposição</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- Main Content Grid -->
+<div class="row g-4 mt-2 mx-2">
+  <!-- Recent Activities -->
+  <div class="col-12 col-lg-8">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-1">Atividades Recentes</h5>
+        <p class="card-text text-muted small mb-0">
+          Últimas movimentações no sistema
+        </p>
+      </div>
+      <div class="card-body">
+        <div class="activity-list">
+          <div class="d-flex align-items-start gap-3 pb-3 border-bottom">
+            <div class="mt-1">
+              <i class="fas fa-cow text-primary"></i>
+            </div>
+            <div class="flex-grow-1">
+              <p class="mb-1 small text-dark">
+                Novo animal cadastrado no lote #004
+              </p>
+              <p class="small text-muted mb-0">Há 2 minutos</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 pb-3 border-bottom mt-3">
+            <div class="mt-1">
+              <i class="fas fa-list-check text-warning"></i>
+            </div>
+            <div class="flex-grow-1">
+              <p class="mb-1 small text-dark">
+                Tarefa 'Aplicação de vacina' concluída
+              </p>
+              <p class="small text-muted mb-0">Há 15 minutos</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 pb-3 border-bottom mt-3">
+            <div class="mt-1">
+              <i class="fas fa-box text-purple"></i>
+            </div>
+            <div class="flex-grow-1">
+              <p class="mb-1 small text-dark">Estoque de ração atualizado</p>
+              <p class="small text-muted mb-0">Há 1 hora</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mt-3">
+            <div class="mt-1">
+              <i class="fas fa-triangle-exclamation text-danger"></i>
+            </div>
+            <div class="flex-grow-1">
+              <p class="mb-1 small text-dark">
+                Alerta de temperatura elevada no setor B
+              </p>
+              <p class="small text-muted mb-0">Há 3 horas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-1">Ações Rápidas</h5>
+        <p class="card-text text-muted small mb-0">
+          Acesso rápido às funções principais
+        </p>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="{% url 'criar_animais' %}" class="btn btn-outline-secondary text-start btn-primary-custom">
+            <i class="bi bi-plus me-2"></i>Cadastrar Animal
+          </a>
+          <a href="{% url 'criar_atividade' %}" class="btn btn-outline-secondary text-start btn-primary-custom">
+              <i class="bi bi-plus-circle me-2"></i> Criar Atividade
+          </a>
+          <a href="{% url 'registrar_movimentacao' %}" class="btn btn-outline-secondary text-start btn-primary-custom">
+            <i class="fas fa-boxes me-2"></i>Entrada no Estoque
+          </a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Performance Summary -->
+<div class="card mt-4 mx-3">
+  <div class="card-header">
+    <h5 class="card-title mb-1">Resumo de Performance</h5>
+    <p class="card-text text-muted small mb-0">
+      Indicadores principais da fazenda
+    </p>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-12 col-md-4">
+        <div
+          class="d-flex align-items-center gap-3 p-3 bg-success bg-opacity-10 rounded"
+        >
+          <i class="fas fa-chart-line fa-2x text-success"></i>
+          <div>
+            <p class="small text-muted mb-0">Produtividade</p>
+            <p class="h5 text-dark mb-0">+15%</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div
+          class="d-flex align-items-center gap-3 p-3 bg-primary bg-opacity-10 rounded"
+        >
+          <i class="fas fa-cow fa-2x text-primary"></i>
+          <div>
+            <p class="small text-muted mb-0">Saúde do Rebanho</p>
+            <p class="h5 text-dark mb-0">98.5%</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div
+          class="d-flex align-items-center gap-3 p-3 bg-purple bg-opacity-10 rounded"
+        >
+          <i class="fas fa-box fa-2x text-purple"></i>
+          <div>
+            <p class="small text-muted mb-0">Nível de Estoque</p>
+            <p class="h5 text-dark mb-0">Adequado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

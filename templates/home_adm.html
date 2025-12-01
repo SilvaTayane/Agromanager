@@ -1,0 +1,779 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+    <style>
+         
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-title {
+            color: #2E5D3A;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            margin-bottom: 1.5rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #2E5D3A, #1a3621);
+            color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .action-btn {
+            background-color: #2E5D3A;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .action-btn:hover {
+            background-color: #1a3621;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .table-responsive {
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background-color: #2E5D3A;
+            color: white;
+            border: none;
+        }
+        
+        .btn-success {
+            background-color: #2E5D3A;
+            border-color: #2E5D3A;
+        }
+        
+        .btn-success:hover {
+            background-color: #1a3621;
+            border-color: #1a3621;
+        }
+        
+        .badge-success {
+            background-color: #2E5D3A;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+        
+        /* Estilos específicos para diferentes páginas */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .kanban-column {
+            background-color: #f8f9fa;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            min-height: 500px;
+        }
+        
+        .kanban-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #2E5D3A;
+        }
+        
+        .map-container {
+            height: 500px;
+            background-color: #e9ecef;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+        
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .weather-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+        
+        .sidebar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-nav .nav-link i {
+            width: 20px;
+            margin-right: 0.5rem;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 14px;
+            background-color: #2E5D3A;
+            color: white;
+        }
+        
+        .dropdown-menu {
+            min-width: 14rem;
+        }
+        
+        .dropdown-item {
+            cursor: pointer;
+        }
+        
+        .btn-logout {
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+        
+        .btn-logout:hover {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+        }
+        
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+    </style>
+
+          
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="bg-white border-bottom border-gray-200 px-4 px-sm-6 py-4 mb-4">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-900">AgroManager</h1>
+                            <p class="text-sm text-gray-600 mb-0" id="user-role-text">
+                                Painel do Administrador
+                            </p>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Dropdown do usuário -->
+                            <div class="dropdown">
+                                <button class="btn d-flex align-items-center gap-2 text-decoration-none" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="avatar" id="user-avatar">
+                                        JS
+                                    </div>
+                                    <div class="text-start">
+                                        <p class="mb-0 text-sm" id="user-name">João Silva</p>
+                                        <p class="mb-0 text-xs text-gray-500" id="user-role">
+                                            Administrador
+                                        </p>
+                                    </div>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><h6 class="dropdown-header">Minha Conta</h6></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-person me-2"></i>
+                                            <span>Perfil</span>
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" id="logout-dropdown">
+                                            <i class="bi bi-box-arrow-right me-2"></i>
+                                            <span>Sair</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Botão de sair visível -->
+                            <button type="button" class="btn btn-outline-secondary btn-logout d-flex align-items-center gap-2" id="logout-btn">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="d-none d-sm-inline">Sair</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Páginas de Conteúdo -->
+            
+            <!-- Dashboard -->
+            <div class="page-content active" id="dashboard">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Visão geral da fazenda</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">Total de Animais</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">23</div>
+                        <div class="stat-label">Tarefas Pendentes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">84%</div>
+                        <div class="stat-label">Saúde do Rebanho</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Alertas do Clima</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h4 class="mb-4">Ações Rápidas</h4>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" data-page="animals-form">
+                            <i class="bi bi-plus-circle me-2"></i>Novo Animal
+                        </a>
+                        <a href="#" class="action-btn" data-page="tasks">
+                            <i class="bi bi-list-task me-2"></i>Gerenciar Tarefas
+                        </a>
+                        <a href="#" class="action-btn" data-page="stock">
+                            <i class="bi bi-box me-2"></i>Ver Estoque
+                        </a>
+                        <a href="#" class="action-btn" data-page="reports">
+                            <i class="bi bi-graph-up me-2"></i>Gerar Relatório
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="content-card">
+                            <h5 class="mb-3">Animais Recentes</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Raça</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="cursor: pointer;" data-page="animal-details">
+                                            <td>Boi Manso</td>
+                                            <td>Nelore</td>
+                                            <td><span class="badge bg-success">Saudável</span></td>
+                                        </tr>
+                                        <tr style="cursor: pointer;" data-page="animal-details">
+                                            <td>Vaca Leiteira</td>
+                                            <td>Holandesa</td>
+                                            <td><span class="badge bg-success">Em lactação</span></td>
+                                        </tr>
+                                        <tr style="cursor: pointer;" data-page="animal-details">
+                                            <td>Bezerro</td>
+                                            <td>Angus</td>
+                                            <td><span class="badge bg-success">Saudável</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="content-card">
+                            <h5 class="mb-3">Tarefas Pendentes</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tarefa</th>
+                                            <th>Prioridade</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Aplicar vacina</td>
+                                            <td><span class="badge bg-danger">Alta</span></td>
+                                            <td><span class="badge bg-secondary">A Fazer</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Limpar estábulo</td>
+                                            <td><span class="badge bg-warning">Média</span></td>
+                                            <td><span class="badge bg-secondary">Em Andamento</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Animais -->
+            <div class="page-content" id="animals-list">
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="page-title">Gestão de Animais</h1>
+                            <p class="page-subtitle">Gerencie o rebanho da fazenda</p>
+                        </div>
+                        <button class="btn btn-success" data-page="animals-form">
+                            <i class="bi bi-plus-circle me-2"></i>Novo Animal
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Raça</th>
+                                    <th>Idade</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Boi Manso</td>
+                                    <td>Nelore</td>
+                                    <td>3 anos</td>
+                                    <td><span class="badge bg-success">Saudável</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" data-page="animal-details">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-page="animals-form">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Vaca Leiteira</td>
+                                    <td>Holandesa</td>
+                                    <td>4 anos</td>
+                                    <td><span class="badge bg-success">Em lactação</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" data-page="animal-details">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-page="animals-form">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Bezerro</td>
+                                    <td>Angus</td>
+                                    <td>6 meses</td>
+                                    <td><span class="badge bg-success">Saudável</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" data-page="animal-details">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-page="animals-form">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Animal -->
+            <div class="page-content" id="animals-form">
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="page-title">Novo Animal</h1>
+                            <p class="page-subtitle">Cadastre um novo animal no sistema</p>
+                        </div>
+                        <button class="btn btn-outline-secondary" data-page="animals-list">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <form id="animal-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="animal-name" class="form-label">Nome do Animal</label>
+                                <input type="text" class="form-control" id="animal-name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="animal-breed" class="form-label">Raça</label>
+                                <select class="form-select" id="animal-breed" required>
+                                    <option value="">Selecione a raça</option>
+                                    <option value="Nelore">Nelore</option>
+                                    <option value="Angus">Angus</option>
+                                    <option value="Holandesa">Holandesa</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="animal-age" class="form-label">Idade</label>
+                                <input type="text" class="form-control" id="animal-age" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="animal-status" class="form-label">Status</label>
+                                <select class="form-select" id="animal-status" required>
+                                    <option value="">Selecione o status</option>
+                                    <option value="Saudável">Saudável</option>
+                                    <option value="Em tratamento">Em tratamento</option>
+                                    <option value="Em lactação">Em lactação</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="animal-notes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="animal-notes" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" data-page="animals-list">
+                                <i class="bi bi-check-circle me-2"></i>Cadastrar Animal
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-page="animals-list">
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Detalhes do Animal -->
+            <div class="page-content" id="animal-details">
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="page-title">Boi Manso</h1>
+                            <p class="page-subtitle">Detalhes completos do animal</p>
+                        </div>
+                        <button class="btn btn-outline-secondary" data-page="animals-list">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="content-card">
+                            <h5 class="mb-4">Informações Básicas</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Raça:</strong> Nelore</p>
+                                    <p><strong>Idade:</strong> 3 anos</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Status:</strong> <span class="badge bg-success">Saudável</span></p>
+                                    <p><strong>ID:</strong> #1</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-card">
+                            <h5 class="mb-4">Histórico de Saúde</h5>
+                            <p class="text-muted">Nenhum registro de saúde encontrado.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="content-card">
+                            <h5 class="mb-4">Ações</h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" data-page="animals-form">
+                                    <i class="bi bi-pencil me-2"></i>Editar Animal
+                                </button>
+                                <button class="btn btn-outline-success">
+                                    <i class="bi bi-plus-circle me-2"></i>Registrar Saúde
+                                </button>
+                                <button class="btn btn-outline-info">
+                                    <i class="bi bi-clock me-2"></i>Agendar Tarefa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarefas -->
+            <div class="page-content" id="tasks">
+                <div class="page-header">
+                    <h1 class="page-title">Gestão de Tarefas</h1>
+                    <p class="page-subtitle">Organize e acompanhe as atividades da fazenda</p>
+                </div>
+
+                <div class="kanban-board">
+                    <div class="kanban-column">
+                        <h6 class="text-center mb-3">A Fazer</h6>
+                        <div class="kanban-card">
+                            <h6>Aplicar vacina</h6>
+                            <span class="badge bg-danger">Alta</span>
+                        </div>
+                    </div>
+                    <div class="kanban-column">
+                        <h6 class="text-center mb-3">Em Andamento</h6>
+                        <div class="kanban-card">
+                            <h6>Limpar estábulo</h6>
+                            <span class="badge bg-warning">Média</span>
+                        </div>
+                    </div>
+                    <div class="kanban-column">
+                        <h6 class="text-center mb-3">Concluído</h6>
+                        <div class="kanban-card">
+                            <h6>Comprar ração</h6>
+                            <span class="badge bg-info">Baixa</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estoque -->
+            <div class="page-content" id="stock">
+                <div class="page-header">
+                    <h1 class="page-title">Gestão de Estoque</h1>
+                    <p class="page-subtitle">Controle de insumos e produtos</p>
+                </div>
+
+                <div class="content-card">
+                    <div class="empty-state">
+                        <i class="bi bi-box"></i>
+                        <h4>Módulo em Desenvolvimento</h4>
+                        <p class="text-muted">A funcionalidade de gestão de estoque estará disponível em breve.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Localização -->
+            <div class="page-content" id="location">
+                <div class="page-header">
+                    <h1 class="page-title">Localização da Fazenda</h1>
+                    <p class="page-subtitle">Mapa e geolocalização</p>
+                </div>
+
+                <div class="content-card">
+                    <div class="map-container">
+                        <div class="text-center">
+                            <i class="bi bi-map" style="font-size: 3rem;"></i>
+                            <p class="mt-2">Mapa da fazenda será exibido aqui</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Relatórios -->
+            <div class="page-content" id="reports">
+                <div class="page-header">
+                    <h1 class="page-title">Relatórios</h1>
+                    <p class="page-subtitle">Análises e relatórios da fazenda</p>
+                </div>
+
+                <div class="content-card">
+                    <div class="empty-state">
+                        <i class="bi bi-graph-up"></i>
+                        <h4>Módulo em Desenvolvimento</h4>
+                        <p class="text-muted">A funcionalidade de relatórios estará disponível em breve.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuários -->
+            <div class="page-content" id="users">
+                <div class="page-header">
+                    <h1 class="page-title">Gestão de Usuários</h1>
+                    <p class="page-subtitle">Administre os usuários do sistema</p>
+                </div>
+
+                <div class="content-card">
+                    <div class="empty-state">
+                        <i class="bi bi-people"></i>
+                        <h4>Módulo em Desenvolvimento</h4>
+                        <p class="text-muted">A funcionalidade de gestão de usuários estará disponível em breve.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clima -->
+            <div class="page-content" id="climate">
+                <div class="page-header">
+                    <h1 class="page-title">Monitoramento Climático</h1>
+                    <p class="page-subtitle">Condições meteorológicas da fazenda</p>
+                </div>
+
+                <div class="weather-grid mb-4">
+                    <div class="weather-card">
+                        <i class="bi bi-thermometer" style="font-size: 2rem;"></i>
+                        <h3 class="mt-2">28°C</h3>
+                        <p class="text-muted">Temperatura</p>
+                    </div>
+                    <div class="weather-card">
+                        <i class="bi bi-droplet" style="font-size: 2rem;"></i>
+                        <h3 class="mt-2">65%</h3>
+                        <p class="text-muted">Umidade</p>
+                    </div>
+                    <div class="weather-card">
+                        <i class="bi bi-wind" style="font-size: 2rem;"></i>
+                        <h3 class="mt-2">15 km/h</h3>
+                        <p class="text-muted">Velocidade do Vento</p>
+                    </div>
+                    <div class="weather-card">
+                        <i class="bi bi-cloud-rain" style="font-size: 2rem;"></i>
+                        <h3 class="mt-2">30%</h3>
+                        <p class="text-muted">Chance de Chuva</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h5 class="mb-3">Previsão do Tempo</h5>
+                    <p class="text-muted">Dados meteorológicos em tempo real serão exibidos aqui.</p>
+                </div>
+            </div>
+        </main>
+   
+
+    
+    <script>
+        // Navegação entre páginas
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar navegação
+            const navLinks = document.querySelectorAll('[data-page]');
+            const pages = document.querySelectorAll('.page-content');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // Esconder todas as páginas
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Mostrar a página alvo
+                    document.getElementById(targetPage).classList.add('active');
+                    
+                    // Atualizar navegação ativa na sidebar
+                    document.querySelectorAll('.sidebar-nav .nav-link').forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    
+                    // Ativar o link correspondente na sidebar
+                    if (targetPage !== 'animals-form' && targetPage !== 'animal-details') {
+                        const sidebarLink = document.querySelector(`.sidebar-nav .nav-link[data-page="${targetPage}"]`);
+                        if (sidebarLink) {
+                            sidebarLink.classList.add('active');
+                        }
+                    }
+                });
+            });
+            
+            // Configurar logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                alert('Função de logout acionada!');
+            });
+            
+            document.getElementById('logout-dropdown').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Função de logout acionada!');
+            });
+        });
+    </script>
+{% endblock %}

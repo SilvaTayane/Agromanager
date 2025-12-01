@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 650px;">
+
+    <!-- BOTÃO VOLTAR -->
+    <div class="mb-4 text-center">
+        <a href="{% url 'area_trabalhador' %}" class="btn btn-success px-4">
+            Voltar às Minhas Atividades
+        </a>
+    </div>
+
+    <!-- CARD PRINCIPAL -->
+    <div class="card shadow-sm border-success">
+        <div class="card-body">
+
+            <h2 class="text-center mb-4 text-success">
+                Atualizar Status da Atividade
+            </h2>
+
+            <!-- INFORMAÇÕES DA ATIVIDADE -->
+            <div class="alert alert-light border-start border-4 border-success mb-4">
+                <h4 class="fw-bold mb-2">{{ atividade.titulo }}</h4>
+
+                <p class="mb-1"><strong>Tipo:</strong> {{ atividade.get_tipo_atividade_display }}</p>
+                <p class="mb-1"><strong>Prioridade:</strong> {{ atividade.get_prioridade_display }}</p>
+                <p class="mb-1"><strong>Status Atual:</strong> {{ atividade.get_status_display }}</p>
+
+                {% if atividade.data_limite %}
+                <p class="mb-0">
+                    <strong>Data Limite:</strong>
+                    {{ atividade.data_limite|date:"d/m/Y H:i" }}
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- MESSAGES -->
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} py-2">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- FORM -->
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- STATUS -->
+                <div class="mb-3">
+                    <label for="status" class="form-label fw-bold">Novo Status *</label>
+                    <select id="status" name="status" class="form-select" required onchange="toggleProblema()">
+                        <option value="">Selecione...</option>
+
+                        <option value="em_andamento" 
+                            {% if atividade.status == 'em_andamento' %}selected{% endif %}>
+                            Em Andamento
+                        </option>
+
+                        <option value="concluida"
+                            {% if atividade.status == 'concluida' %}selected{% endif %}>
+                            Concluída
+                        </option>
+
+                        <option value="com_problemas">
+                            Com Problemas
+                        </option>
+
+                        <option value="pendente"
+                            {% if atividade.status == 'pendente' %}selected{% endif %}>
+                            Pendente
+                        </option>
+                    </select>
+                </div>
+
+                <!-- DESCRIÇÃO DO PROBLEMA -->
+                <div class="mb-3" id="problema-field" style="display: none;">
+                    <label class="form-label fw-bold" for="descricao_problema">
+                        Descrição do Problema *
+                    </label>
+                    <textarea id="descricao_problema" name="descricao_problema"
+                              rows="4" class="form-control"
+                              placeholder="Descreva detalhadamente o problema..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+                    Atualizar Status
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT DO CAMPO CONDICIONAL -->
+<script>
+    function toggleProblema() {
+        const status = document.getElementById("status").value;
+        const field = document.getElementById("problema-field");
+        const textarea = document.getElementById("descricao_problema");
+
+        if (status === "com_problemas") {
+            field.style.display = "block";
+            textarea.required = true;
+        } else {
+            field.style.display = "none";
+            textarea.required = false;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", toggleProblema);
+</script>
+
+{% endblock %}

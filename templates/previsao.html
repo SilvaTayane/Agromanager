@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <h1 class="h3 mb-4 text-gray-900">📅 Previsão para 7 dias</h1>
+
+    {% if previsao.time %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Temp. Máx (°C)</th>
+                                <th>Temp. Mín (°C)</th>
+                                <th>Chuva (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in previsao.time|length|make_list %}
+                            {% with idx=forloop.counter0 %}
+                            <tr>
+                                <td>{{ previsao.time.idx }}</td>
+                                <td>{{ previsao.temperature_2m_max.idx }}</td>
+                                <td>{{ previsao.temperature_2m_min.idx }}</td>
+                                <td>{{ previsao.precipitation_probability_max.idx }}</td>
+                            </tr>
+                            {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning">Não foi possível carregar a previsão.</div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
